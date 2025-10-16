@@ -44,7 +44,7 @@ def internet_search():
     data = request.get_json()
     query = data.get('query')
     if not query:
-        return jsonify({'error': 'Missing \"query\" parameter'}), 400
+        return jsonify({'error': 'Missing "query" parameter'}), 400
     url = f'https://api.duckduckgo.com/?q={query}&format=json'
     try:
         resp = requests.get(url, timeout=10)
@@ -73,6 +73,40 @@ def internet_search():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/google_search', methods=['POST'])
+def google_search():
+    data = request.get_json()
+    query = data.get('query')
+    if not query:
+        return jsonify({'error': 'Missing "query" parameter'}), 400
+    google_api_key = "AIzaSyDc7FeDWabe6OzQwr9vI9lfjOeGOKWtsSY"
+    google_cse_id = "568434ec3261742b4"
+
+    url = 'https://www.googleapis.com/customsearch/v1'
+    params = {
+        'key': google_api_key,
+        'cx': google_cse_id,
+        'q': query,
+    }
+    try:
+        resp = requests.get(url, params=params, timeout=10)
+        resp.raise_for_status()
+        results = resp.json()
+        parsed = []
+        for item in results.get('items', []):
+            entry = {
+                'title': item.get('title'),
+                'snippet': item.get('snippet'),
+                'link': item.get('link')
+            }
+            parsed.append(entry)
+        return jsonify({
+            'query': query,
+            'results': parsed
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/', methods=['GET'])
 def health():
     return jsonify({'status': 'healthy', 'service': 'gyaan-ai-scraper'})
@@ -81,4 +115,3 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
-
