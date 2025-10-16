@@ -66,6 +66,7 @@ def internet_search():
             'results': parsed
         })
     except Exception as e:
+        print("Exception in /generate:", e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/google_search', methods=['POST'])
@@ -100,6 +101,7 @@ def google_search():
             'results': parsed
         })
     except Exception as e:
+        print("Exception in /generate:", e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/generate', methods=['POST'])
@@ -138,6 +140,7 @@ def generate_gemini():
                         replies.append(part['text'])
         return jsonify({'prompt': prompt, 'responses': replies})
     except Exception as e:
+        print("Exception in /generate:", e)
         return jsonify({'error': str(e)}), 500
 
 @app.route('/', methods=['GET'])
