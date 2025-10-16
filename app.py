@@ -107,6 +107,44 @@ def google_search():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/generate', methods=['POST'])
+def generate_gemini():
+    data = request.get_json()
+    prompt = data.get('prompt')
+    if not prompt:
+        return jsonify({'error': 'Missing "prompt" parameter'}), 400
+    gemini_api_key = "AIzaSyBdq5c_j1asQWf6Ao5ngROZDKIRLc_MrgA"
+
+    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
+    headers = {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': gemini_api_key
+    }
+    payload = {
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": prompt
+                    }
+                ]
+            }
+        ]
+    }
+    try:
+        resp = requests.post(url, headers=headers, json=payload, timeout=15)
+        resp.raise_for_status()
+        results = resp.json()
+        replies = []
+        for candidate in results.get('candidates', []):
+            if 'content' in candidate and 'parts' in candidate['content']:
+                for part in candidate['content']['parts']:
+                    if 'text' in part:
+                        replies.append(part['text'])
+        return jsonify({'prompt': prompt, 'responses': replies})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/', methods=['GET'])
 def health():
     return jsonify({'status': 'healthy', 'service': 'gyaan-ai-scraper'})
