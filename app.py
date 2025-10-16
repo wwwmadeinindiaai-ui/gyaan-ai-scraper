@@ -115,7 +115,7 @@ def generate_gemini():
         return jsonify({'error': 'Missing "prompt" parameter'}), 400
     gemini_api_key = "AIzaSyBdq5c_j1asQWf6Ao5ngROZDKIRLc_MrgA"
 
-    url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent'
+    url = 'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent'
     headers = {
         'Content-Type': 'application/json',
         'x-goog-api-key': gemini_api_key
