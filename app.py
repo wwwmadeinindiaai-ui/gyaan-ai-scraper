@@ -39,6 +39,40 @@ def scrape():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
 
+@app.route('/search', methods=['POST'])
+def internet_search():
+    data = request.get_json()
+    query = data.get('query')
+    if not query:
+        return jsonify({'error': 'Missing \"query\" parameter'}), 400
+    url = f'https://api.duckduckgo.com/?q={query}&format=json'
+    try:
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        results = resp.json()
+        # Parse DuckDuckGo results top-level RelatedTopics array
+        parsed = []
+        for topic in results.get('RelatedTopics', []):
+            if isinstance(topic, dict):
+                entry = {
+                    'text': topic.get('Text'),
+                    'url': topic.get('FirstURL')
+                }
+                parsed.append(entry)
+            elif 'Topics' in topic:
+                for subtopic in topic['Topics']:
+                    entry = {
+                        'text': subtopic.get('Text'),
+                        'url': subtopic.get('FirstURL')
+                    }
+                    parsed.append(entry)
+        return jsonify({
+            'query': query,
+            'results': parsed
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/', methods=['GET'])
 def health():
     return jsonify({'status': 'healthy', 'service': 'gyaan-ai-scraper'})
@@ -47,3 +81,4 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 8080))
     app.run(host='0.0.0.0', port=port)
+
