@@ -120,6 +120,7 @@ def generate_gemini():
     payload = {
         "contents": [
             {
+                "role": "user",
                 "parts": [
                     {
                         "text": prompt
