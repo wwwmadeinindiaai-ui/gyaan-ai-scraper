@@ -79,8 +79,8 @@ def google_search():
     query = data.get('query')
     if not query:
         return jsonify({'error': 'Missing "query" parameter'}), 400
-    google_api_key = "AIzaSyDc7FeDWabe6OzQwr9vI9lfjOeGOKWtsSY"
-    google_cse_id = "568434ec3261742b4"
+google_api_key = os.environ.get('GOOGLE_API_KEY')
+google_cse_id = os.environ.get('GOOGLE_CSE_ID')
 
     url = 'https://www.googleapis.com/customsearch/v1'
     params = {
@@ -113,7 +113,9 @@ def generate_gemini():
     prompt = data.get('prompt')
     if not prompt:
         return jsonify({'error': 'Missing "prompt" parameter'}), 400
-    gemini_api_key = "AIzaSyBdq5c_j1asQWf6Ao5ngROZDKIRLc_MrgA"
+    import os
+gemini_api_key = os.environ.get('GEMINI_API_KEY')
+
 
     url = 'https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent'
     headers = {
